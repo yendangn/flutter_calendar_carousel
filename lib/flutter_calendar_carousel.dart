@@ -332,6 +332,17 @@ class _CalendarState<T extends EventInterface>
       height: widget.height,
       child: Column(
         children: <Widget>[
+          WeekdayRow(
+            firstDayOfWeek,
+            widget.customWeekDayBuilder,
+            showWeekdays: widget.showWeekDays,
+            weekdayFormat: widget.weekDayFormat,
+            weekdayMargin: widget.weekDayMargin,
+            weekdayPadding: widget.weekDayPadding,
+            weekdayBackgroundColor: widget.weekDayBackgroundColor,
+            weekdayTextStyle: widget.weekdayTextStyle,
+            localeDate: _localeDate,
+          ),
           CalendarHeader(
             showHeader: widget.showHeader,
             headerMargin: widget.headerMargin,
@@ -371,17 +382,6 @@ class _CalendarState<T extends EventInterface>
                     }
                   }
                 : null,
-          ),
-          WeekdayRow(
-            firstDayOfWeek,
-            widget.customWeekDayBuilder,
-            showWeekdays: widget.showWeekDays,
-            weekdayFormat: widget.weekDayFormat,
-            weekdayMargin: widget.weekDayMargin,
-            weekdayPadding: widget.weekDayPadding,
-            weekdayBackgroundColor: widget.weekDayBackgroundColor,
-            weekdayTextStyle: widget.weekdayTextStyle,
-            localeDate: _localeDate,
           ),
           Expanded(
               child: PageView.builder(
