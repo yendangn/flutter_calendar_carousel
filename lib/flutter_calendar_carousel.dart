@@ -344,6 +344,7 @@ class _CalendarState<T extends EventInterface>
             weekdayTextStyle: widget.weekdayTextStyle,
             localeDate: _localeDate,
           ),
+          Divider(),
           CalendarHeader(
             showHeader: widget.showHeader,
             headerMargin: widget.headerMargin,
