@@ -279,7 +279,8 @@ class _CalendarState<T extends EventInterface>
       /// width percentage
     );
 
-    _localeDate = DateFormat.yMMM(widget.locale);
+    _localeDate = DateFormat('MMMM, yyyy', widget.locale);
+
     firstDayOfWeek = widget.firstDayOfWeek ??
         (_localeDate.dateSymbols.FIRSTDAYOFWEEK + 1) % 7;
 
