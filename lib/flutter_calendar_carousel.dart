@@ -78,6 +78,7 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
   final String? headerText;
   final TextStyle? weekendTextStyle;
   final EventList<T>? markedDatesMap;
+  final List<int>? dayInWeekDisable;
 
   /// Change `makredDateWidget` when `markedDateShowIcon` is set to false.
   final Widget? markedDateWidget;
@@ -206,7 +207,7 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
     this.onHeaderTitlePressed,
     this.onLeftArrowPressed,
     this.onRightArrowPressed,
-    this.weekDayFormat = WeekdayFormat.short,
+    this.weekDayFormat = WeekdayFormat.standaloneNarrow,
     this.staticSixWeekFormat = false,
     this.isScrollable = true,
     this.scrollDirection = Axis.horizontal,
@@ -218,6 +219,7 @@ class CalendarCarousel<T extends EventInterface> extends StatefulWidget {
     this.showIconBehindDayText = false,
     this.pageScrollPhysics = const ScrollPhysics(),
     this.shouldShowTransform = true,
+    this.dayInWeekDisable,
   }) : super(key: key);
 
   @override
@@ -470,14 +472,16 @@ class _CalendarState<T extends EventInterface>
     return Container(
       margin: EdgeInsets.all(widget.dayPadding),
       child: GestureDetector(
-        onLongPress: () => _onDayLongPressed(now),
+        onLongPress: () => _checkIsDisable(now) ? null : _onDayLongPressed(now),
         child: FlatButton(
           color: isSelectedDay && widget.selectedDayButtonColor != null
               ? widget.selectedDayButtonColor
               : isToday && widget.todayButtonColor != null
                   ? widget.todayButtonColor
                   : widget.dayButtonColor,
-          onPressed: widget.disableDayPressed ? null : () => _onDayPressed(now),
+          onPressed: (widget.disableDayPressed || _checkIsDisable(now))
+              ? null
+              : () => _onDayPressed(now),
           padding: EdgeInsets.all(widget.dayPadding),
           shape: widget.markedDateCustomShapeBorder != null &&
                   markedDatesMap != null &&
@@ -656,7 +660,9 @@ class _CalendarState<T extends EventInterface>
                     textStyle = widget.markedDateCustomTextStyle;
                   }
                   bool isSelectable = true;
-                  if (now.millisecondsSinceEpoch <
+                  if (_checkIsDisable(now)) {
+                    isSelectable = false;
+                  } else if (now.millisecondsSinceEpoch <
                       minDate.millisecondsSinceEpoch)
                     isSelectable = false;
                   else if (now.millisecondsSinceEpoch >
@@ -757,7 +763,9 @@ class _CalendarState<T extends EventInterface>
                       return Container();
                     }
                     bool isSelectable = true;
-                    if (now.millisecondsSinceEpoch <
+                    if (_checkIsDisable(now)) {
+                      isSelectable = false;
+                    } else if (now.millisecondsSinceEpoch <
                         minDate.millisecondsSinceEpoch)
                       isSelectable = false;
                     else if (now.millisecondsSinceEpoch >
@@ -819,6 +827,11 @@ class _CalendarState<T extends EventInterface>
       }
       return d;
     });
+  }
+
+  bool _checkIsDisable(DateTime picked) {
+    int dayInWeek = picked.weekday;
+    return widget.dayInWeekDisable?.contains(dayInWeek) == true;
   }
 
   void _onDayLongPressed(DateTime picked) {
@@ -1162,8 +1175,16 @@ class _CalendarState<T extends EventInterface>
 
       final styleForBuilder = appTextStyle.merge(dayStyle);
 
-      dayContainer = customDayBuilder(isSelectable, index, isSelectedDay, isToday,
-          isPrevMonthDay, styleForBuilder, isNextMonthDay, isThisMonthDay, now);
+      dayContainer = customDayBuilder(
+          isSelectable,
+          index,
+          isSelectedDay,
+          isToday,
+          isPrevMonthDay,
+          styleForBuilder,
+          isNextMonthDay,
+          isThisMonthDay,
+          now);
     }
 
     return dayContainer ??
